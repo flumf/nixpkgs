@@ -294,9 +294,16 @@ makeScopeWithSplicing' {
         extraPackages = [
           targetLlvmPackages.compiler-rt
         ]
-        ++ lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD) [
-          targetLlvmPackages.libunwind
-        ];
+        ++
+          lib.optionals
+            (
+              !stdenv.targetPlatform.isWasm
+              && !stdenv.targetPlatform.isFreeBSD
+              && !stdenv.targetPlatform.isOpenBSD
+            )
+            [
+              targetLlvmPackages.libunwind
+            ];
         extraBuildCommands = mkExtraBuildCommands cc;
         nixSupport.cc-cflags = [
           "-rtlib=compiler-rt"
@@ -304,16 +311,21 @@ makeScopeWithSplicing' {
           "-B${targetLlvmPackages.compiler-rt}/lib"
         ]
         ++ lib.optional (
-          !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
+          !stdenv.targetPlatform.isWasm
+          && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
         ) "--unwindlib=libunwind"
         ++ lib.optional (
           !stdenv.targetPlatform.isWasm
           && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
           && stdenv.targetPlatform.useLLVM or false
         ) "-lunwind"
         ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
         nixSupport.cc-ldflags = lib.optionals (
-          !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
+          !stdenv.targetPlatform.isWasm
+          && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
         ) [ "-L${targetLlvmPackages.libunwind}/lib" ];
       };
 
@@ -331,7 +343,10 @@ makeScopeWithSplicing' {
         ++
           lib.optionals
             (
-              !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD && !stdenv.targetPlatform.isDarwin
+              !stdenv.targetPlatform.isWasm
+              && !stdenv.targetPlatform.isFreeBSD
+              && !stdenv.targetPlatform.isOpenBSD
+              && !stdenv.targetPlatform.isDarwin
             )
             [
               targetLlvmPackages.libunwind
@@ -343,16 +358,23 @@ makeScopeWithSplicing' {
           "-B${targetLlvmPackages.compiler-rt-no-libc}/lib"
         ]
         ++ lib.optional (
-          !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD && !stdenv.targetPlatform.isDarwin
+          !stdenv.targetPlatform.isWasm
+          && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
+          && !stdenv.targetPlatform.isDarwin
         ) "--unwindlib=libunwind"
         ++ lib.optional (
           !stdenv.targetPlatform.isWasm
           && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
           && stdenv.targetPlatform.useLLVM or false
         ) "-lunwind"
         ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
         nixSupport.cc-ldflags = lib.optionals (
-          !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD && !stdenv.targetPlatform.isDarwin
+          !stdenv.targetPlatform.isWasm
+          && !stdenv.targetPlatform.isFreeBSD
+          && !stdenv.targetPlatform.isOpenBSD
+          && !stdenv.targetPlatform.isDarwin
         ) [ "-L${targetLlvmPackages.libunwind}/lib" ];
       };
 

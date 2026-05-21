@@ -4270,7 +4270,8 @@ with pkgs;
   libllvm = llvmPackages.libllvm;
   llvm-manpages = llvmPackages.llvm-manpages;
 
-  llvmPackages = llvmPackages_21;
+  llvmPackages = if stdenv.targetPlatform.isOpenBSD then llvmPackages_openbsd else llvmPackages_21;
+  llvmPackages_openbsd = callPackage ../os-specific/bsd/openbsd/pkgs/llvm { };
 
   inherit
     (rec {
